@@ -1,11 +1,23 @@
 #!/usr/bin/env node
 
-import { existsSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 
 
 
 class Fjord {
 	constructor () {}
+
+	format (inputJsonPath: string) {
+		console.log(`Formatting: ${inputJsonPath}`);
+		const inputJsonText = readFileSync(inputJsonPath, 'utf8');
+		try {
+			const jo = JSON.parse(inputJsonText);
+			console.log(jo);
+		} catch (error) {
+			console.log(`\tError: ${error}`);
+			console.log(`\tCould not parse: '${inputJsonPath}'`);
+		}
+	}
 }
 
 
@@ -15,7 +27,8 @@ function doStuff (args: string[]) {
 
 	for (const arg of args) {
 		if (existsSync(arg)) {
-			console.log(`Found: ${arg}`);
+			// console.log(`Found: ${arg}`);
+			fj.format(arg);
 		} else {
 			const command = arg.toUpperCase();
 			switch (command) {
@@ -29,6 +42,11 @@ function doStuff (args: string[]) {
 					console.log(`\tLets use 4 spaces!`); break;
 				case 'TAB': case 'TABS': case 'T':
 					console.log(`\tLets use tabs!`); break;
+
+				case 'FJ':
+				case 'ASK':
+				case 'REPLACE':
+				case 'PRINT':
 				default:
 					console.log(`\tUnknown command or file: '${arg}'`);
 			}
