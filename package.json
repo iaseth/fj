@@ -13,5 +13,8 @@
     "json"
   ],
   "author": "Ankur Seth",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.9.0"
+  }
 }
