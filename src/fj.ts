@@ -4,8 +4,10 @@ import { existsSync, readFileSync, writeFileSync } from "fs";
 import * as path from "path";
 
 
-const print = console.log;
 
+const prompt = require('prompt-sync')();
+
+const print = console.log;
 
 function saveTextToFile (text: string, filePath: string) {
 	writeFileSync(filePath, text);
@@ -54,12 +56,14 @@ class Fjord {
 
 		switch (this.outputMode) {
 			case 'ASK':
-				print(`\tCustom: ${inputJsonPath}`)
+				const customOutputJsonPath = prompt('    Where to save: ');
+				saveTextToFile(outputJsonText, customOutputJsonPath);
+				print(`\tSaved: ${customOutputJsonPath}`)
 				break;
 			case 'FJ':
-				const outputJsonPath = path.format({ ...path.parse(inputJsonPath), base: '', ext: '.fj.json' })
-				saveTextToFile(outputJsonText, outputJsonPath);
-				print(`\tUpdated: ${outputJsonPath}`)
+				const fjOutputJsonPath = path.format({ ...path.parse(inputJsonPath), base: '', ext: '.fj.json' })
+				saveTextToFile(outputJsonText, fjOutputJsonPath);
+				print(`\tUpdated: ${fjOutputJsonPath}`)
 				break;
 			case 'REPLACE':
 				saveTextToFile(outputJsonText, inputJsonPath);
