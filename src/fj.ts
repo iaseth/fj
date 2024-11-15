@@ -16,7 +16,7 @@ type OutputModeDS = 'ASK' | 'FJ' | 'PRINT' | 'REPLACE';
 
 
 class Fjord {
-	tabs: boolean = false;
+	tabs: boolean = true;
 	spaces: number = 4;
 	outputMode: OutputModeDS = 'PRINT';
 
