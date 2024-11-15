@@ -1,28 +1,26 @@
 #!/usr/bin/env node
 
-import { existsSync, readFileSync } from "fs";
+import { existsSync, readFileSync, writeFileSync } from "fs";
+import * as path from "path";
 
+
+const print = console.log;
+
+
+function saveTextToFile (text: string, filePath: string) {
+	writeFileSync(filePath, text);
+}
+
+
+type OutputModeDS = 'ASK' | 'FJ' | 'PRINT' | 'REPLACE';
 
 
 class Fjord {
 	tabs: boolean = false;
 	spaces: number = 4;
+	outputMode: OutputModeDS = 'PRINT';
 
 	constructor () {}
-
-	format (inputJsonPath: string) {
-		console.log(`Formatting: ${inputJsonPath}`);
-		const inputJsonText = readFileSync(inputJsonPath, 'utf8');
-		try {
-			const jo = JSON.parse(inputJsonText);
-			// console.log(jo);
-			const outputJsonText = JSON.stringify(jo, null, this.getIndentation());
-			console.log(outputJsonText);
-		} catch (error) {
-			console.log(`\tError: ${error}`);
-			console.log(`\tCould not parse: '${inputJsonPath}'`);
-		}
-	}
 
 	getIndentation () {
 		return this.tabs ? '\t' : this.spaces;
@@ -32,6 +30,45 @@ class Fjord {
 	useSpaces (spaces: number) {
 		this.tabs = false;
 		this.spaces = spaces;
+	}
+
+	useAskMode () { this.outputMode = 'ASK'; }
+	useFjMode () { this.outputMode = 'FJ'; }
+	usePrintMode () { this.outputMode = 'PRINT'; }
+	useReplaceMode () { this.outputMode = 'REPLACE'; }
+
+	format (inputJsonPath: string) {
+		print(`Formatting: ${inputJsonPath}`);
+		const inputJsonText = readFileSync(inputJsonPath, 'utf8');
+		try {
+			const jo = JSON.parse(inputJsonText);
+			this.produceOutput(jo, inputJsonPath);
+		} catch (error) {
+			print(`\tError: ${error}`);
+			print(`\tCould not parse: '${inputJsonPath}'`);
+		}
+	}
+
+	produceOutput (jo: any, inputJsonPath: string) {
+		const outputJsonText = JSON.stringify(jo, null, this.getIndentation());
+
+		switch (this.outputMode) {
+			case 'ASK':
+				print(`\tCustom: ${inputJsonPath}`)
+				break;
+			case 'FJ':
+				const outputJsonPath = path.format({ ...path.parse(inputJsonPath), base: '', ext: '.fj.json' })
+				saveTextToFile(outputJsonText, outputJsonPath);
+				print(`\tUpdated: ${outputJsonPath}`)
+				break;
+			case 'REPLACE':
+				saveTextToFile(outputJsonText, inputJsonPath);
+				print(`\tReplaced: ${inputJsonPath}`)
+				break;
+			case 'PRINT':
+			default:
+				print(outputJsonText);
+		}
 	}
 }
 
@@ -58,10 +95,11 @@ function doStuff (args: string[]) {
 				case 'TAB': case 'TABS': case 'T':
 					console.log(`\tLets use tabs!`); fj.useTabs(); break;
 
-				case 'FJ':
-				case 'ASK':
-				case 'REPLACE':
-				case 'PRINT':
+				case 'ASK': fj.useAskMode(); break;
+				case 'FJ': fj.useFjMode(); break;
+				case 'REPLACE': fj.useReplaceMode(); break;
+				case 'PRINT': fj.usePrintMode(); break;
+
 				default:
 					console.log(`\tUnknown command or file: '${arg}'`);
 			}
