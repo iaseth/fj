@@ -20,6 +20,7 @@ type OutputModeDS = 'ASK' | 'FJ' | 'PRINT' | 'REPLACE';
 class Fjord {
 	tabs: boolean = true;
 	spaces: number = 4;
+	endNewLine: boolean = false;
 	outputMode: OutputModeDS = 'PRINT';
 
 	constructor () {}
@@ -33,6 +34,7 @@ class Fjord {
 		this.tabs = false;
 		this.spaces = spaces;
 	}
+	useEndNewLine (v: boolean = true) { this.endNewLine = v; }
 
 	useAskMode () { this.outputMode = 'ASK'; }
 	useFjMode () { this.outputMode = 'FJ'; }
@@ -51,8 +53,13 @@ class Fjord {
 		}
 	}
 
-	produceOutput (jo: any, inputJsonPath: string) {
+	toJson (jo: any) {
 		const outputJsonText = JSON.stringify(jo, null, this.getIndentation());
+		return this.endNewLine ? outputJsonText + '\n' : outputJsonText;
+	}
+
+	produceOutput (jo: any, inputJsonPath: string) {
+		const outputJsonText = this.toJson(jo);
 
 		switch (this.outputMode) {
 			case 'ASK':
@@ -98,6 +105,8 @@ function doStuff (args: string[]) {
 					console.log(`\tLets use 4 spaces!`); fj.useSpaces(4); break;
 				case 'TAB': case 'TABS': case 'T':
 					console.log(`\tLets use tabs!`); fj.useTabs(); break;
+
+				case 'ENL': fj.useEndNewLine(); break;
 
 				case 'ASK': fj.useAskMode(); break;
 				case 'FJ': fj.useFjMode(); break;
