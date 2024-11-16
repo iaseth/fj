@@ -29,10 +29,18 @@ class Fjord {
 		return this.tabs ? '\t' : this.spaces;
 	}
 
-	useTabs () { this.tabs = true; }
+	useTabs () {
+		this.tabs = true;
+		print(`\tLets use tabs!`);
+	}
 	useSpaces (spaces: number) {
 		this.tabs = false;
 		this.spaces = spaces;
+		if (this.spaces === 0) {
+			print(`\tLets minify this!`);
+		} else {
+			print(`\tLets use ${this.spaces} spaces!`);
+		}
 	}
 	useEndNewLine (v: boolean = true) { this.endNewLine = v; }
 
@@ -86,25 +94,20 @@ class Fjord {
 
 function doStuff (args: string[]) {
 	const fj = new Fjord();
-	console.log(`Created new Fjord . . .`);
+	print(`Created new Fjord . . .`);
 
 	for (const arg of args) {
 		if (existsSync(arg)) {
-			// console.log(`Found: ${arg}`);
+			// print(`Found: ${arg}`);
 			fj.format(arg);
 		} else {
 			const command = arg.toUpperCase();
 			switch (command) {
-				case 'MIN':
-					console.log(`\tLets minify this!`); break;
-				case 'S1': case '1S': case 'S':
-					console.log(`\tLets use 1 space!`); fj.useSpaces(1); break;
-				case 'S2': case '2S': case 'SS':
-					console.log(`\tLets use 2 spaces!`); fj.useSpaces(2); break;
-				case 'S4': case '4S': case 'SSSS':
-					console.log(`\tLets use 4 spaces!`); fj.useSpaces(4); break;
-				case 'TAB': case 'TABS': case 'T':
-					console.log(`\tLets use tabs!`); fj.useTabs(); break;
+				case 'MIN': fj.useSpaces(0); break;
+				case 'S1': case '1S': case 'S': fj.useSpaces(1); break;
+				case 'S2': case '2S': case 'SS': fj.useSpaces(2); break;
+				case 'S4': case '4S': case 'SSSS': fj.useSpaces(4); break;
+				case 'TAB': case 'TABS': case 'T': fj.useTabs(); break;
 
 				case 'ENL': fj.useEndNewLine(); break;
 
@@ -114,7 +117,7 @@ function doStuff (args: string[]) {
 				case 'PRINT': fj.usePrintMode(); break;
 
 				default:
-					console.log(`\tUnknown command or file: '${arg}'`);
+					print(`\tUnknown command or file: '${arg}'`);
 			}
 		}
 	}
@@ -124,7 +127,7 @@ function doStuff (args: string[]) {
 function main () {
 	const args = process.argv.slice(2);
 	if (args.length === 0) {
-		console.log(`No args supplied!`);
+		print(`No args supplied!`);
 	} else {
 		doStuff(args);
 	}
